@@ -8,6 +8,10 @@
 
 # COMMAND ----------
 
+# MAGIC %run ../includes/configuration
+
+# COMMAND ----------
+
 # MAGIC %md 
 # MAGIC ### Importing ...
 
@@ -18,12 +22,17 @@ from pyspark.sql.functions import col, lit, current_timestamp
 
 # COMMAND ----------
 
+dbutils.widgets.text("p_data_source", "Ergast")
+data_source = dbutils.widgets.get("p_data_source")
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ### Setting up source details
 
 # COMMAND ----------
 
-source_path  = "/mnt/saadlspsd/raw/circuits.csv"
+source_path  = f"{raw_folder_path}circuits.csv"
 source_format = "csv"
 source_schema = StructType(
   [
@@ -97,7 +106,7 @@ renamed_cols_df = column_pruned_df.transform(applied_renames)
 # COMMAND ----------
 
 
-audit_df = renamed_cols_df.transform(audit_columns)
+audit_df = renamed_cols_df.transform(audit_columns).transform(add_data_source(data_source))
 
 # COMMAND ----------
 
@@ -106,17 +115,13 @@ audit_df = renamed_cols_df.transform(audit_columns)
 
 # COMMAND ----------
 
-target_path = "/mnt/saadlspsd/processed/circuits"
+target_path = f"{processed_folder_path}circuits"
 target_format = "parquet"
 target_write_mode = "overwrite"
 
 # COMMAND ----------
 
 audit_df.write.format(target_format).mode(target_write_mode).save(target_path)
-
-# COMMAND ----------
-
-display(dbutils.fs.ls(target_path))
 
 # COMMAND ----------
 

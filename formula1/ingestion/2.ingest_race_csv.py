@@ -3,11 +3,20 @@
 
 # COMMAND ----------
 
+# MAGIC %run ../includes/configuration
+
+# COMMAND ----------
+
 from pyspark.sql.functions import col, lit, current_timestamp, concat, to_timestamp
 
 # COMMAND ----------
 
-source_path  = "/mnt/saadlspsd/raw/races.csv"
+dbutils.widgets.text("p_data_source", "Ergast")
+data_source = dbutils.widgets.get("p_data_source")
+
+# COMMAND ----------
+
+source_path  = f"{raw_folder_path}races.csv"
 source_format = "csv"
 source_schema = 'raceId int,year int,round int,circuitId int,name string,date string,time string,url string'
 source_read_options = {
@@ -47,11 +56,11 @@ added_timestamp_df = column_pruned_df.withColumn('race_timestamp', to_timestamp(
 
 # COMMAND ----------
 
-audit_df = added_timestamp_df.transform(audit_columns)
+audit_df = added_timestamp_df.transform(audit_columns).transform(add_data_source(data_source))
 
 # COMMAND ----------
 
-target_path = "/mnt/saadlspsd/processed/races"
+target_path = f"{processed_folder_path}races"
 target_format = "parquet"
 target_write_mode = "overwrite"
 

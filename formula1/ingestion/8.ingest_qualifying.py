@@ -3,11 +3,16 @@
 
 # COMMAND ----------
 
+# MAGIC %run ../includes/configuration
+
+# COMMAND ----------
+
 from pyspark.sql.functions import col, lit, current_timestamp, concat, when
 
 # COMMAND ----------
 
-# MAGIC %fs ls /mnt/saadlspsd/raw/qualifying
+dbutils.widgets.text("p_data_source", "Ergast")
+data_source = dbutils.widgets.get("p_data_source")
 
 # COMMAND ----------
 
@@ -16,7 +21,7 @@ from pyspark.sql.functions import col, lit, current_timestamp, concat, when
 
 # COMMAND ----------
 
-source_path  = "/mnt/saadlspsd/raw/qualifying"
+source_path  = f"{raw_folder_path}qualifying"
 source_format = "json"
 source_schema = 'qualifyId bigint,raceId bigint,driverId bigint,constructorId bigint,position bigint,q1 string,q2 string,q3 string'
 source_read_options = {
@@ -43,7 +48,7 @@ renames = {
 
 # COMMAND ----------
 
-transformations = [remove_null_string('\\N'), apply_renames(renames), audit_columns]
+transformations = [remove_null_string('\\N'), apply_renames(renames), audit_columns, add_data_source(data_source)]
 
 # COMMAND ----------
 
@@ -51,7 +56,7 @@ final_df = source_df.transform(apply_transformation(transformations))
 
 # COMMAND ----------
 
-target_path = "/mnt/saadlspsd/processed/qualifying"
+target_path = f"{processed_folder_path}qualifying"
 target_format = "parquet"
 target_write_mode = "overwrite"
 

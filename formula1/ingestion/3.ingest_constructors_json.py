@@ -3,7 +3,16 @@
 
 # COMMAND ----------
 
+# MAGIC %run ../includes/configuration
+
+# COMMAND ----------
+
 from pyspark.sql.functions import col, lit, current_timestamp
+
+# COMMAND ----------
+
+dbutils.widgets.text("p_data_source", "Ergast")
+data_source = dbutils.widgets.get("p_data_source")
 
 # COMMAND ----------
 
@@ -12,7 +21,7 @@ from pyspark.sql.functions import col, lit, current_timestamp
 
 # COMMAND ----------
 
-source_path  = "/mnt/saadlspsd/raw/constructors.json"
+source_path  = f"{raw_folder_path}constructors.json"
 source_format = "json"
 source_schema = 'constructorId int,constructorRef string,name string, nationality string,url string'
 source_read_options = {
@@ -62,7 +71,7 @@ renamed_cols_df = column_pruned_df.transform(apply_renames(renames))
 
 # COMMAND ----------
 
-audit_df = renamed_cols_df.transform(audit_columns)
+audit_df = renamed_cols_df.transform(audit_columns).transform(add_data_source(data_source))
 
 # COMMAND ----------
 
@@ -71,7 +80,7 @@ audit_df = renamed_cols_df.transform(audit_columns)
 
 # COMMAND ----------
 
-target_path = "/mnt/saadlspsd/processed/constructors"
+target_path = f"{processed_folder_path}constructors"
 target_format = "parquet"
 target_write_mode = "overwrite"
 

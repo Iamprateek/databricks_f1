@@ -7,7 +7,12 @@ from pyspark.sql.functions import col, lit, current_timestamp, concat, when
 
 # COMMAND ----------
 
+# MAGIC %run ../includes/configuration
 
+# COMMAND ----------
+
+dbutils.widgets.text("p_data_source", "Ergast")
+data_source = dbutils.widgets.get("p_data_source")
 
 # COMMAND ----------
 
@@ -16,7 +21,7 @@ from pyspark.sql.functions import col, lit, current_timestamp, concat, when
 
 # COMMAND ----------
 
-source_path  = "/mnt/saadlspsd/raw/pit_stops.json"
+source_path  = f"{raw_folder_path}pit_stops.json"
 source_format = "json"
 source_schema = 'driverId bigint,duration string,lap bigint,milliseconds bigint,raceId bigint,stop bigint,time string'
 source_read_options = {
@@ -41,7 +46,7 @@ renames = {
 
 # COMMAND ----------
 
-transformations = [remove_null_string('\\N'), apply_renames(renames), audit_columns]
+transformations = [remove_null_string('\\N'), apply_renames(renames), audit_columns,  add_data_source(data_source)]
 
 # COMMAND ----------
 
@@ -49,7 +54,7 @@ final_df = source_df.transform(apply_transformation(transformations))
 
 # COMMAND ----------
 
-target_path = "/mnt/saadlspsd/processed/pitstops"
+target_path = f"{processed_folder_path}pitstops"
 target_format = "parquet"
 target_write_mode = "overwrite"
 

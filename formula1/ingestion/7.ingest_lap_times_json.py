@@ -3,11 +3,16 @@
 
 # COMMAND ----------
 
-from pyspark.sql.functions import col, lit, current_timestamp, concat, when
+# MAGIC %run ../includes/configuration
 
 # COMMAND ----------
 
-# MAGIC %fs ls /mnt/saadlspsd/raw/lap_times
+dbutils.widgets.text("p_data_source", "Ergast")
+data_source = dbutils.widgets.get("p_data_source")
+
+# COMMAND ----------
+
+from pyspark.sql.functions import col, lit, current_timestamp, concat, when
 
 # COMMAND ----------
 
@@ -16,7 +21,7 @@ from pyspark.sql.functions import col, lit, current_timestamp, concat, when
 
 # COMMAND ----------
 
-source_path  = "/mnt/saadlspsd/raw/lap_times"
+source_path  = f"{raw_folder_path}lap_times"
 source_format = "csv"
 source_schema = 'raceId bigint,driverId bigint,lap bigint,position bigint,time string, millisecond bigint'
 source_read_options = {
@@ -41,7 +46,7 @@ renames = {
 
 # COMMAND ----------
 
-transformations = [remove_null_string('\\N'), apply_renames(renames), audit_columns]
+transformations = [remove_null_string('\\N'), apply_renames(renames), audit_columns, add_data_source(data_source)]
 
 # COMMAND ----------
 
@@ -49,7 +54,7 @@ final_df = source_df.transform(apply_transformation(transformations))
 
 # COMMAND ----------
 
-target_path = "/mnt/saadlspsd/processed/lap_times"
+target_path = f"{processed_folder_path}lap_times"
 target_format = "parquet"
 target_write_mode = "overwrite"
 
