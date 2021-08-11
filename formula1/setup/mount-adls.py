@@ -1,7 +1,7 @@
 # Databricks notebook source
 storage_account_name = "saadlspsd"
-client_id = dbutils.secrets.get(scope = 'f1-scope', key='f1-clientid') # service procipal app registration
-tenant_id  = dbutils.secrets.get(scope = 'f1-scope', key='f1-tenantid') # service procipal app registration 
+client_id = dbutils.secrets.get(scope = 'f1-scope', key='f1-clientid') # service principal app registration
+tenant_id  = dbutils.secrets.get(scope = 'f1-scope', key='f1-tenantid') # service principal app registration 
 client_secret = dbutils.secrets.get(scope = 'f1-scope', key='f1-clientsecret') # created with role assignment on adls storage
 
 # COMMAND ----------
@@ -27,6 +27,7 @@ def mount_container(container_name, storage_account_name):
 
 container_raw = "raw"
 container_processed = "processed"
+container_presentation = "presentation"
 
 # COMMAND ----------
 
@@ -53,3 +54,11 @@ mount_container(container_raw, storage_account_name)
 # COMMAND ----------
 
 mount_container(container_processed, storage_account_name)
+
+# COMMAND ----------
+
+mount_container(container_presentation, storage_account_name)
+
+# COMMAND ----------
+
+

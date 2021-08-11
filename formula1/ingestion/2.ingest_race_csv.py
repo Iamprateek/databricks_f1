@@ -52,7 +52,7 @@ renamed_cols_df = column_pruned_df.transform(apply_renames(renames))
 
 # COMMAND ----------
 
-added_timestamp_df = column_pruned_df.withColumn('race_timestamp', to_timestamp(concat(col("date"), lit(' '), col('time')), 'yyyy-MM-dd hh:mm:ss'))
+added_timestamp_df = renamed_cols_df.withColumn('race_timestamp', to_timestamp(concat(col("date"), lit(' '), col('time')), 'yyyy-MM-dd hh:mm:ss'))
 
 # COMMAND ----------
 
