@@ -16,7 +16,12 @@ data_source = dbutils.widgets.get("p_data_source")
 
 # COMMAND ----------
 
-source_path  = f"{raw_folder_path}races.csv"
+dbutils.widgets.text("v_file_date", "2021-03-21")
+file_dt = dbutils.widgets.get("v_file_date")
+
+# COMMAND ----------
+
+source_path  = f"{raw_folder_path}{file_dt}/races.csv"
 source_format = "csv"
 source_schema = 'raceId int,year int,round int,circuitId int,name string,date string,time string,url string'
 source_read_options = {
@@ -56,7 +61,7 @@ added_timestamp_df = renamed_cols_df.withColumn('race_timestamp', to_timestamp(c
 
 # COMMAND ----------
 
-audit_df = added_timestamp_df.transform(audit_columns).transform(add_data_source(data_source))
+audit_df = added_timestamp_df.transform(audit_columns).transform(add_data_source(data_source)).transform(file_date(file_dt))
 
 # COMMAND ----------
 

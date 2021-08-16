@@ -16,12 +16,17 @@ data_source = dbutils.widgets.get("p_data_source")
 
 # COMMAND ----------
 
+dbutils.widgets.text("v_file_date", "2021-03-21")
+file_dt = dbutils.widgets.get("v_file_date")
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC # ingesting constructors data
 
 # COMMAND ----------
 
-source_path  = f"{raw_folder_path}constructors.json"
+source_path  = f"{raw_folder_path}{file_dt}/constructors.json"
 source_format = "json"
 source_schema = 'constructorId int,constructorRef string,name string, nationality string,url string'
 source_read_options = {
@@ -71,7 +76,7 @@ renamed_cols_df = column_pruned_df.transform(apply_renames(renames))
 
 # COMMAND ----------
 
-audit_df = renamed_cols_df.transform(audit_columns).transform(add_data_source(data_source))
+audit_df = renamed_cols_df.transform(audit_columns).transform(add_data_source(data_source)).transform(file_date(file_dt))
 
 # COMMAND ----------
 

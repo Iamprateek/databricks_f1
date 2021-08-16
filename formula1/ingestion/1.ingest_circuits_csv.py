@@ -27,12 +27,17 @@ data_source = dbutils.widgets.get("p_data_source")
 
 # COMMAND ----------
 
+dbutils.widgets.text("v_file_date", "2021-03-21")
+file_dt = dbutils.widgets.get("v_file_date")
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ### Setting up source details
 
 # COMMAND ----------
 
-source_path  = f"{raw_folder_path}circuits.csv"
+source_path  = f"{raw_folder_path}{file_dt}/circuits.csv"
 source_format = "csv"
 source_schema = StructType(
   [
@@ -106,7 +111,7 @@ renamed_cols_df = column_pruned_df.transform(applied_renames)
 # COMMAND ----------
 
 
-audit_df = renamed_cols_df.transform(audit_columns).transform(add_data_source(data_source))
+audit_df = renamed_cols_df.transform(audit_columns).transform(add_data_source(data_source)).transform(file_date(file_dt))
 
 # COMMAND ----------
 
@@ -122,7 +127,3 @@ target_write_mode = "overwrite"
 # COMMAND ----------
 
 audit_df.write.format(target_format).mode(target_write_mode).save(target_path)
-
-# COMMAND ----------
-
-

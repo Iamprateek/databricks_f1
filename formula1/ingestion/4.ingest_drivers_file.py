@@ -17,12 +17,17 @@ data_source = dbutils.widgets.get("p_data_source")
 
 # COMMAND ----------
 
+dbutils.widgets.text("v_file_date", "2021-03-21")
+file_dt = dbutils.widgets.get("v_file_date")
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC # ingesting drivers data
 
 # COMMAND ----------
 
-source_path  = f"{raw_folder_path}drivers.json"
+source_path  = f"{raw_folder_path}{file_dt}/drivers.json"
 source_format = "json"
 source_schema = 'code string,dob date,driverId bigint,driverRef string,name struct<forename:string,surname:string>,nationality string,number int,url string'
 source_read_options = {
@@ -67,7 +72,7 @@ renames = {
 
 # COMMAND ----------
 
-transformations = [construct_name, apply_renames(renames), drop_url, audit_columns, add_data_source(data_source)]
+transformations = [construct_name, apply_renames(renames), drop_url, audit_columns, add_data_source(data_source), file_date(file_dt)]
 
 # COMMAND ----------
 
